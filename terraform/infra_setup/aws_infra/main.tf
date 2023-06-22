@@ -166,7 +166,7 @@ resource "aws_s3_bucket_public_access_block" "example" {
 }
 
 resource "aws_iam_user" "session_recording_user" {
-  name = "boudary-session-recording"
+  name = "boundary-session-recording"
   
 }
 
