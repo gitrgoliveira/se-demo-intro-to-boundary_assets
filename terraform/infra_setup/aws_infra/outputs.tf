@@ -37,3 +37,8 @@ output "app_infra_ssh_privkey" {
   description = "The raw content of the app infrastructure SSH private key."
   value = tls_private_key.aws_infra_ssh_key.private_key_openssh
 }
+
+output "session_recording_bucket" {
+  description = "AWS S3 bucket to be used for session recording"
+  value = aws_s3_bucket.session_recording_bucket.bucket
+}

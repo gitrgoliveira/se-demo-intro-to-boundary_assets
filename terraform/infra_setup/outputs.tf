@@ -38,6 +38,11 @@ output "aws_secgroup_private" {
   value       = module.aws_infra.aws_secgroup_private_id
 }
 
+output "session_recording_bucket" {
+  description = "AWS S3 bucket to be used for session recording"
+  value = module.aws_infra.session_recording_bucket
+}
+
 output "boundary_worker_ip_public" {
   description = "The public IP of the Boundary worker."
   value       = module.boundary_setup.boundary_worker_ip_public
