@@ -151,3 +151,59 @@ resource "aws_route_table_association" "boundary_demo_private" {
   subnet_id      = aws_subnet.boundary_demo_private.id
   route_table_id = aws_route_table.boundary_demo_private.id
 }
+
+resource "aws_s3_bucket" "session_recording_bucket" {
+  bucket = "${var.unique_name}-boundary-recording"
+}
+
+resource "aws_s3_bucket_public_access_block" "example" {
+  bucket = aws_s3_bucket.session_recording_bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_iam_user" "session_recording_user" {
+  name = "boudary-session-recording"
+  
+}
+
+resource "aws_iam_policy" "session_recording_bucket_policy" {
+  name        = "session_recording_bucket_policy"
+  path        = "/"
+  description = "session recording bucket policy"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+   "Version": "2012-10-17",
+   "Statement": [
+      {
+         "Action": [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:GetObjectAttributes"
+         ],
+         "Effect": "Allow",
+         "Resource": "${aws_s3_bucket.session_recording_bucket.arn}/*"
+      },
+      {
+         "Action": [
+            "iam:DeleteAccessKey",
+            "iam:GetUser",
+            "iam:CreateAccessKey"
+         ],
+         "Effect": "Allow",
+         "Resource": "${aws_iam_user.session_recording_user.arn}"
+      }
+   ]
+})
+}
+
+resource "aws_iam_user_policy_attachment" "attach_recording_policy" {
+  policy_arn = aws_iam_policy.session_recording_bucket_policy.arn
+  user = aws_iam_user.session_recording_user.name
+  
+}
